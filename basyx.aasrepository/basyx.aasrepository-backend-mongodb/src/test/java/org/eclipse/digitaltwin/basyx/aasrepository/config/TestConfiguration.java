@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 @Configuration
 public class TestConfiguration {
@@ -27,7 +28,7 @@ public class TestConfiguration {
 	private String database;
 	
 	@Bean
-	public MongoDatabaseFactory databaseFactory(MongoClient client) {
+	public MongoDatabaseFactory databaseFactory() {
 		StringBuilder connectionBuilder = new StringBuilder("mongodb://");
 		connectionBuilder.append(userName);
 		connectionBuilder.append(":");
@@ -35,7 +36,10 @@ public class TestConfiguration {
 		connectionBuilder.append("@");
 		connectionBuilder.append(host);
 		connectionBuilder.append(":");
-		connectionBuilder.append(port);		
+		connectionBuilder.append(port);
+		
+		MongoClient client = MongoClients.create();
+		
 		return new SimpleMongoClientDatabaseFactory(client, database);
 //		return new SimpleMongoClientDatabaseFactory("mongodb://mongoAdmin:mongoPassword@localhost:27017/test");
 	}
