@@ -21,6 +21,9 @@ public class TestConfiguration {
 	@Value("${spring.data.mongodb.password}")
 	private String password;
 	
+	@Value("${spring.data.mongodb.database}")
+	private String database;
+	
 	@Bean
 	public MongoDatabaseFactory databaseFactory() {
 		StringBuilder connectionBuilder = new StringBuilder("mongodb://");
@@ -32,7 +35,7 @@ public class TestConfiguration {
 		connectionBuilder.append(":");
 		connectionBuilder.append(port);		
 		
-		return new SimpleMongoClientDatabaseFactory("mongodb://mongoAdmin:mongoPassword@localhost:27017");
+		return new SimpleMongoClientDatabaseFactory("mongodb://mongoAdmin:mongoPassword@localhost:27017/test");
 	}
 
 }
