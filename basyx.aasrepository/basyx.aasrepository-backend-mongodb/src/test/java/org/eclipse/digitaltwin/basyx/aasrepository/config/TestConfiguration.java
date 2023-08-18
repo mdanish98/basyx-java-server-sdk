@@ -37,7 +37,6 @@ public class TestConfiguration {
 		connectionBuilder.append(host);
 		connectionBuilder.append(":");
 		connectionBuilder.append(port);
-		
 		MongoClient client = MongoClients.create();
 		
 		return new SimpleMongoClientDatabaseFactory(client, database);
