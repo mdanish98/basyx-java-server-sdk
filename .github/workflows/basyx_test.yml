@@ -79,7 +79,7 @@ jobs:
       - name: Start environment
         run: docker compose --project-directory ./ci up -d --wait
       - name: Build BaSyx
-        run: mvn clean install ${MVN_ARGS_BUILD_BASYX}
+        run: mvn clean install
       - name: Test AAS Environment
         run: mvn test -f "basyx.aasenvironment/pom.xml"
       - name: Stop environment
