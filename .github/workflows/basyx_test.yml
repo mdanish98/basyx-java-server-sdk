@@ -1,6 +1,8 @@
 name: Build and Test BaSyx
 
 on:
+  push:
+    branches: [ test ]
   pull_request:
     branches: [ main ]
     paths-ignore:
