@@ -94,7 +94,7 @@ public class InMemoryCrudRepository<T> implements BaSyxCrudRepository<T> {
 		}
 
 		if (paginationInfo.getLimit() != null) {
-			filteredAssets = filteredAssets.stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
+			filteredAssets = inMemoryStore.values().stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
 		}
 
 		return filteredAssets;
