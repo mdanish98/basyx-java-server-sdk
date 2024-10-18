@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,13 +37,14 @@ import org.eclipse.digitaltwin.aas4j.v3.model.ConceptDescription;
 import org.eclipse.digitaltwin.aas4j.v3.model.EmbeddedDataSpecification;
 import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
 import org.eclipse.digitaltwin.basyx.conceptdescriptionrepository.ConceptDescriptionRepository;
+import org.eclipse.digitaltwin.basyx.core.BaSyxCrudRepository;
 import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.IdentificationMismatchException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.MissingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.pagination.CursorResult;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
-import org.eclipse.digitaltwin.basyx.core.pagination.PaginationSupport;
+import org.eclipse.digitaltwin.basyx.core.pagination.PaginationUtilities;
 import org.springframework.data.repository.CrudRepository;
 
 /**
@@ -56,7 +56,7 @@ import org.springframework.data.repository.CrudRepository;
  */
 public class CrudConceptDescriptionRepository implements ConceptDescriptionRepository {
 
-	private CrudRepository<ConceptDescription, String> conceptDescriptionBackend;
+	private BaSyxCrudRepository<ConceptDescription> conceptDescriptionBackend;
 	private String conceptDescriptionRepositoryName = null;
 
 	public CrudConceptDescriptionRepository(ConceptDescriptionBackendProvider conceptDescriptionBackendProvider) {
@@ -87,53 +87,45 @@ public class CrudConceptDescriptionRepository implements ConceptDescriptionRepos
 
 	@Override
 	public CursorResult<List<ConceptDescription>> getAllConceptDescriptions(PaginationInfo pInfo) {
-		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll();
-		List<ConceptDescription> conceptDescriptions = StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
-
-		TreeMap<String, ConceptDescription> conceptDescriptionMap = conceptDescriptions.stream().collect(Collectors.toMap(ConceptDescription::getId, conceptDescription -> conceptDescription, (a, b) -> a, TreeMap::new));
-
-		PaginationSupport<ConceptDescription> paginationSupport = new PaginationSupport<>(conceptDescriptionMap, ConceptDescription::getId);
-
-		return paginationSupport.getPaged(pInfo);
+		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll(pInfo);
+		List<ConceptDescription> filteredConceptDescriptions = StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+		
+		String cursor = PaginationUtilities.resolveCursor(pInfo, filteredConceptDescriptions, ConceptDescription::getId);
+		
+		return new CursorResult<>(cursor, filteredConceptDescriptions);
 	}
 
 	@Override
 	public CursorResult<List<ConceptDescription>> getAllConceptDescriptionsByIdShort(String idShort, PaginationInfo pInfo) {
-		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll();
+		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll(pInfo);
 		
 		List<ConceptDescription> filtered = StreamSupport.stream(iterable.spliterator(), false).filter(conceptDescription -> conceptDescription.getIdShort().equals(idShort)).collect(Collectors.toList());
 		
-		TreeMap<String, ConceptDescription> conceptDescriptionMap = filtered.stream().collect(Collectors.toMap(ConceptDescription::getId, conceptDescription -> conceptDescription, (a, b) -> a, TreeMap::new));
+		String cursor = PaginationUtilities.resolveCursor(pInfo, filtered, ConceptDescription::getId);
 		
-		PaginationSupport<ConceptDescription> paginationSupport = new PaginationSupport<>(conceptDescriptionMap, ConceptDescription::getId);
-
-		return paginationSupport.getPaged(pInfo);
+		return new CursorResult<>(cursor, filtered);
 	}
 
 	@Override
 	public CursorResult<List<ConceptDescription>> getAllConceptDescriptionsByIsCaseOf(Reference isCaseOf, PaginationInfo pInfo) {
-		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll();
+		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll(pInfo);
 		
 		List<ConceptDescription> filtered = StreamSupport.stream(iterable.spliterator(), false).filter(conceptDescription -> hasMatchingReference(conceptDescription, isCaseOf)).collect(Collectors.toList());
 		
-		TreeMap<String, ConceptDescription> conceptDescriptionMap = filtered.stream().collect(Collectors.toMap(ConceptDescription::getId, conceptDescription -> conceptDescription, (a, b) -> a, TreeMap::new));
+		String cursor = PaginationUtilities.resolveCursor(pInfo, filtered, ConceptDescription::getId);
 		
-		PaginationSupport<ConceptDescription> paginationSupport = new PaginationSupport<>(conceptDescriptionMap, ConceptDescription::getId);
-
-		return paginationSupport.getPaged(pInfo);
+		return new CursorResult<>(cursor, filtered);
 	}
 
 	@Override
 	public CursorResult<List<ConceptDescription>> getAllConceptDescriptionsByDataSpecificationReference(Reference dataSpecificationReference, PaginationInfo pInfo) {
-		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll();
+		Iterable<ConceptDescription> iterable = conceptDescriptionBackend.findAll(pInfo);
 		
 		List<ConceptDescription> filtered = StreamSupport.stream(iterable.spliterator(), false).filter(conceptDescription -> hasMatchingDataSpecificationReference(conceptDescription, dataSpecificationReference)).collect(Collectors.toList());
 		
-		TreeMap<String, ConceptDescription> conceptDescriptionMap = filtered.stream().collect(Collectors.toMap(ConceptDescription::getId, conceptDescription -> conceptDescription, (a, b) -> a, TreeMap::new));
+		String cursor = PaginationUtilities.resolveCursor(pInfo, filtered, ConceptDescription::getId);
 		
-		PaginationSupport<ConceptDescription> paginationSupport = new PaginationSupport<>(conceptDescriptionMap, ConceptDescription::getId);
-
-		return paginationSupport.getPaged(pInfo);
+		return new CursorResult<>(cursor, filtered);
 	}
 
 	@Override
