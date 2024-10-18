@@ -28,8 +28,8 @@ package org.eclipse.digitaltwin.basyx.aasrepository.backend.inmemory;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.basyx.aasrepository.backend.AasBackendProvider;
 import org.eclipse.digitaltwin.basyx.common.backend.inmemory.core.InMemoryCrudRepository;
+import org.eclipse.digitaltwin.basyx.core.BaSyxCrudRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class AasInMemoryBackendProvider implements AasBackendProvider {
 
 	@Override
-	public CrudRepository<AssetAdministrationShell, String> getCrudRepository() {
+	public BaSyxCrudRepository<AssetAdministrationShell> getCrudRepository() {
 		return new InMemoryCrudRepository<AssetAdministrationShell>(AssetAdministrationShell::getId);
 	}
 

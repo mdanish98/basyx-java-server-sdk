@@ -25,6 +25,8 @@
 
 package org.eclipse.digitaltwin.basyx.common.backend.inmemory.core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +35,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.springframework.data.repository.CrudRepository;
+import org.eclipse.digitaltwin.basyx.core.BaSyxCrudRepository;
+import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
 import org.springframework.lang.NonNull;
 
 /**
@@ -41,11 +44,11 @@ import org.springframework.lang.NonNull;
  * 
  * @author danish
  */
-public class InMemoryCrudRepository<T> implements CrudRepository<T, String> {
-	
+public class InMemoryCrudRepository<T> implements BaSyxCrudRepository<T> {
+
 	private final ConcurrentMap<String, T> inMemoryStore = new ConcurrentHashMap<>();
 	private Function<T, String> idGetter;
-	
+
 	public InMemoryCrudRepository(Function<T, String> idGetter) {
 		this.idGetter = idGetter;
 	}
@@ -53,9 +56,9 @@ public class InMemoryCrudRepository<T> implements CrudRepository<T, String> {
 	@Override
 	public @NonNull <S extends T> S save(@NonNull S entity) {
 		String id = idGetter.apply(entity);
-		
+
 		inMemoryStore.put(id, entity);
-		
+
 		return entity;
 	}
 
@@ -82,6 +85,22 @@ public class InMemoryCrudRepository<T> implements CrudRepository<T, String> {
 	}
 
 	@Override
+	public @NonNull Iterable<T> findAll(PaginationInfo paginationInfo) {
+
+		List<T> filteredAssets = new ArrayList<>();
+
+		if (paginationInfo.getCursor() != null) {
+			filteredAssets = inMemoryStore.values().stream().filter(asset -> idGetter.apply(asset).compareTo(paginationInfo.getCursor()) > 0).collect(Collectors.toList());
+		}
+
+		if (paginationInfo.getLimit() != null) {
+			filteredAssets = filteredAssets.stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
+		}
+
+		return filteredAssets;
+	}
+
+	@Override
 	public @NonNull Iterable<T> findAllById(@NonNull Iterable<String> ids) {
 		return StreamSupport.stream(ids.spliterator(), false).map(inMemoryStore::get).filter(Objects::nonNull).collect(Collectors.toList());
 	}
@@ -99,7 +118,7 @@ public class InMemoryCrudRepository<T> implements CrudRepository<T, String> {
 	@Override
 	public void delete(@NonNull T entity) {
 		String id = idGetter.apply(entity);
-		
+
 		inMemoryStore.remove(id);
 	}
 
@@ -111,7 +130,7 @@ public class InMemoryCrudRepository<T> implements CrudRepository<T, String> {
 
 	@Override
 	public void deleteAll(@NonNull Iterable<? extends T> entities) {
-		
+
 		for (T entity : entities)
 			inMemoryStore.remove(idGetter.apply(entity));
 	}
@@ -120,6 +139,5 @@ public class InMemoryCrudRepository<T> implements CrudRepository<T, String> {
 	public void deleteAll() {
 		inMemoryStore.clear();
 	}
-
 
 }

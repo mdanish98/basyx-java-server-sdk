@@ -37,13 +37,14 @@ import org.eclipse.digitaltwin.aas4j.v3.model.Reference;
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepository;
 import org.eclipse.digitaltwin.basyx.aasservice.AasService;
 import org.eclipse.digitaltwin.basyx.aasservice.AasServiceFactory;
+import org.eclipse.digitaltwin.basyx.core.BaSyxCrudRepository;
 import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.IdentificationMismatchException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.MissingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.pagination.CursorResult;
 import org.eclipse.digitaltwin.basyx.core.pagination.PaginationInfo;
-import org.eclipse.digitaltwin.basyx.core.pagination.PaginationSupport;
+import org.eclipse.digitaltwin.basyx.core.pagination.PaginationUtilities;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
 
@@ -51,12 +52,12 @@ import org.springframework.data.repository.CrudRepository;
  * Default Implementation for the {@link AasRepository} based on Spring
  * {@link CrudRepository}
  * 
- * @author mateusmolina, despen, zhangzai, kammognie
+ * @author mateusmolina, despen, zhangzai, kammognie, danish
  *
  */
 public class CrudAasRepository implements AasRepository {
 
-	private CrudRepository<AssetAdministrationShell, String> aasBackend;
+	private BaSyxCrudRepository<AssetAdministrationShell> aasBackend;
 
 	private AasServiceFactory aasServiceFactory;
 
@@ -76,14 +77,12 @@ public class CrudAasRepository implements AasRepository {
 	@Override
 	public CursorResult<List<AssetAdministrationShell>> getAllAas(PaginationInfo pInfo) {
 
-		Iterable<AssetAdministrationShell> iterable = aasBackend.findAll();
-		List<AssetAdministrationShell> allAas = StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+		Iterable<AssetAdministrationShell> iterableAas = aasBackend.findAll(pInfo);
+		List<AssetAdministrationShell> filteredAas = StreamSupport.stream(iterableAas.spliterator(), false).collect(Collectors.toList());
 
-		TreeMap<String, AssetAdministrationShell> aasMap = allAas.stream().collect(Collectors.toMap(AssetAdministrationShell::getId, aas -> aas, (a, b) -> a, TreeMap::new));
-
-		PaginationSupport<AssetAdministrationShell> paginationSupport = new PaginationSupport<>(aasMap, AssetAdministrationShell::getId);
-
-		return paginationSupport.getPaged(pInfo);
+		String cursor = PaginationUtilities.resolveCursor(pInfo, filteredAas, AssetAdministrationShell::getId);
+		
+		return new CursorResult<>(cursor, filteredAas);
 	}
 
 	@Override

@@ -28,14 +28,14 @@ package org.eclipse.digitaltwin.basyx.aasrepository.backend.mongodb;
 import org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell;
 import org.eclipse.digitaltwin.basyx.aasrepository.backend.AasBackendProvider;
 import org.eclipse.digitaltwin.basyx.common.mongocore.BasyxMongoMappingContext;
+import org.eclipse.digitaltwin.basyx.common.mongocore.MongoDBCrudRepository;
+import org.eclipse.digitaltwin.basyx.core.BaSyxCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
-import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,11 +62,11 @@ public class AasMongoDBBackendProvider implements AasBackendProvider {
 	}
 
 	@Override
-	public CrudRepository<AssetAdministrationShell, String> getCrudRepository() {
+	public BaSyxCrudRepository<AssetAdministrationShell> getCrudRepository() {
 		@SuppressWarnings("unchecked")
 		MongoPersistentEntity<AssetAdministrationShell> entity = (MongoPersistentEntity<AssetAdministrationShell>) mappingContext.getPersistentEntity(AssetAdministrationShell.class);
 		
-		return new SimpleMongoRepository<>(new MappingMongoEntityInformation<>(entity), template);
+		return new MongoDBCrudRepository<AssetAdministrationShell>(new MappingMongoEntityInformation<>(entity), template, AssetAdministrationShell.class);
 	}
 
 }
