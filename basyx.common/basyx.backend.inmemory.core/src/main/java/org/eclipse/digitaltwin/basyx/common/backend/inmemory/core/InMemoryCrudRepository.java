@@ -87,14 +87,14 @@ public class InMemoryCrudRepository<T> implements BaSyxCrudRepository<T> {
 	@Override
 	public @NonNull Iterable<T> findAll(PaginationInfo paginationInfo) {
 
-		List<T> filteredAssets = new ArrayList<>();
+		List<T> filteredAssets = new ArrayList<>(inMemoryStore.values());
 
 		if (paginationInfo.getCursor() != null) {
-			filteredAssets = inMemoryStore.values().stream().filter(asset -> idGetter.apply(asset).compareTo(paginationInfo.getCursor()) > 0).collect(Collectors.toList());
+			filteredAssets = filteredAssets.stream().filter(asset -> idGetter.apply(asset).compareTo(paginationInfo.getCursor()) > 0).collect(Collectors.toList());
 		}
 
 		if (paginationInfo.getLimit() != null) {
-			filteredAssets = inMemoryStore.values().stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
+			filteredAssets = filteredAssets.stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
 		}
 
 		return filteredAssets;
