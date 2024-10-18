@@ -29,6 +29,7 @@ public class MongoDBCrudRepository<T> extends SimpleMongoRepository<T, String> i
 		
 		List<AggregationOperation> allAggregations = new LinkedList<>();
 		
+		MongoDBUtilities.applySorting(allAggregations);
 		MongoDBUtilities.applyPagination(paginationInfo, allAggregations);
 		
 		AggregationResults<T> results = mongoTemplate.aggregate(Aggregation.newAggregation(allAggregations), clazz, clazz);

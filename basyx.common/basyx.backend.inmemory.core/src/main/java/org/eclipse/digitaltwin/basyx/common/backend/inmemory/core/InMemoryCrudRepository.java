@@ -27,6 +27,7 @@ package org.eclipse.digitaltwin.basyx.common.backend.inmemory.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,17 +88,31 @@ public class InMemoryCrudRepository<T> implements BaSyxCrudRepository<T> {
 	@Override
 	public @NonNull Iterable<T> findAll(PaginationInfo paginationInfo) {
 
-		List<T> filteredAssets = new ArrayList<>(inMemoryStore.values());
+		List<T> sortedData = applySorting();
+
+		List<T> filteredData = new ArrayList<>(sortedData);
 
 		if (paginationInfo.getCursor() != null) {
-			filteredAssets = filteredAssets.stream().filter(asset -> idGetter.apply(asset).compareTo(paginationInfo.getCursor()) > 0).collect(Collectors.toList());
+			filteredData = filteredData.stream().filter(asset -> idGetter.apply(asset).compareTo(paginationInfo.getCursor()) > 0).collect(Collectors.toList());
 		}
 
 		if (paginationInfo.getLimit() != null) {
-			filteredAssets = filteredAssets.stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
+			filteredData = filteredData.stream().limit(paginationInfo.getLimit()).collect(Collectors.toList());
 		}
 
-		return filteredAssets;
+		return filteredData;
+	}
+
+	private List<T> applySorting() {
+		List<Map.Entry<String, T>> entries = new ArrayList<>(inMemoryStore.entrySet());
+		entries.sort(Map.Entry.comparingByKey());
+
+		List<T> sortedValues = new ArrayList<>();
+		
+		for (Map.Entry<String, T> entry : entries)
+			sortedValues.add(entry.getValue());
+
+		return sortedValues;
 	}
 
 	@Override

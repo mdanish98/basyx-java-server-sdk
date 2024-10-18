@@ -66,6 +66,7 @@ public class MongoDBUtilities {
 	
 	public static void applySorting(List<AggregationOperation> allAggregations) {
 		SortOperation sortOp = Aggregation.sort(Direction.ASC, ID);
+		
 		allAggregations.add(sortOp);
 	}
 	
