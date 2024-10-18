@@ -16,10 +16,12 @@ public class MongoDBCrudRepository<T> extends SimpleMongoRepository<T, String> i
 	
 	private MongoTemplate mongoTemplate;
 	private Class<T> clazz;
+	private MongoEntityInformation<T, String> metadata;
 
 	public MongoDBCrudRepository(MongoEntityInformation<T, String> metadata, MongoTemplate mongoTemplate, Class<T> clazz) {
 		super(metadata, mongoTemplate);
 		
+		this.metadata = metadata;
 		this.mongoTemplate = mongoTemplate;
 		this.clazz = clazz;
 	}
@@ -32,7 +34,7 @@ public class MongoDBCrudRepository<T> extends SimpleMongoRepository<T, String> i
 		MongoDBUtilities.applySorting(allAggregations);
 		MongoDBUtilities.applyPagination(paginationInfo, allAggregations);
 		
-		AggregationResults<T> results = mongoTemplate.aggregate(Aggregation.newAggregation(allAggregations), clazz, clazz);
+		AggregationResults<T> results = mongoTemplate.aggregate(Aggregation.newAggregation(allAggregations), metadata.getCollectionName(), clazz);
 		
 		return results.getMappedResults();
 	}
