@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.eclipse.digitaltwin.basyx.aasregistry.service.storage.AasRegistryStorage;
 import org.eclipse.digitaltwin.basyx.digitaltwinregistry.component.DigitalTwinRegistryComponent;
-import org.eclipse.digitaltwin.basyx.digitaltwinregistry.testcases.helper.AASRegistryScanConfig;
 import org.eclipse.digitaltwin.basyx.digitaltwinregistry.testcases.helper.TenantFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

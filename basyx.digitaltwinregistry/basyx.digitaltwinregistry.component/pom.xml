@@ -18,10 +18,6 @@
 	</properties>
 
 	<dependencies>
-		<!--<dependency>
-			<groupId>org.eclipse.digitaltwin.basyx</groupId>
-			<artifactId>basyx.digitaltwinregistry-http</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>org.eclipse.digitaltwin.basyx</groupId>
 			<artifactId>basyx.aasdiscoveryservice-http</artifactId>
@@ -50,10 +46,6 @@
 			<groupId>org.eclipse.digitaltwin.basyx</groupId>
 			<artifactId>basyx.aasdiscoveryservice-feature-authorization</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.eclipse.digitaltwin.basyx</groupId>
-			<artifactId>basyx.core</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>org.eclipse.digitaltwin.basyx</groupId>
 			<artifactId>basyx.aasregistry-service</artifactId>
@@ -75,20 +67,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.eclipse.digitaltwin.basyx</groupId>
-			<artifactId>basyx.http</artifactId>
-		</dependency>-->
-		<!--<dependency>
-			<groupId>org.eclipse.digitaltwin.basyx</groupId>
-			<artifactId>basyx.http</artifactId>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>-->
-		<!--<dependency>
-			<groupId>org.eclipse.digitaltwin.basyx</groupId>
-			<artifactId>basyx.mongodbcore</artifactId>
-		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
@@ -109,11 +87,6 @@
 			<groupId>org.xmlunit</groupId>
 			<artifactId>xmlunit-matchers</artifactId>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.apache.httpcomponents.client5</groupId>
-			<artifactId>httpclient5</artifactId>
-			<scope>test</scope>
-		</dependency>-->
 	</dependencies>
 
 	<build>
